@@ -37,6 +37,7 @@ public class RotationLockProblem {
         }
     }
 
+    // Answer is 1141
     public int GetNumberOfTimesLockStopsAt0() {
         var moves = LoadTextFile();
         var position = POSITION;
@@ -50,6 +51,7 @@ public class RotationLockProblem {
         return count;
     }
 
+    // Answer is 6634
     public int GetTotalNumberOfTimes0isPassed() {
         var moves = LoadTextFile();
         var position = POSITION;
