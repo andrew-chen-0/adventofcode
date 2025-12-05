@@ -31,16 +31,31 @@ public class RepeatingNumbersProblem {
     public void findTotalOfRepeatingNumbersInFile() {
         var minMaxPairs = LoadTextFile();
         var result1 = minMaxPairs.stream()
-                .map(pair -> findTotalOfRepeatingNumbersSlow(pair[0], pair[1]))
+                .map(pair -> findTotalOfEvenDigitRepeatingNumbersSlow(pair[0], pair[1]))
                 .reduce(0L, Long::sum);
         var result2 = minMaxPairs.stream()
-                .map(pair -> findTotalOfRepeatingNumbersFast(pair[0], pair[1]))
+                .map(pair -> findTotalOfEvenDigitRepeatingNumbersFast(pair[0], pair[1]))
                 .reduce(0L, Long::sum);
-        System.out.println(result1);
-        System.out.println(result2);
+        var oddNumberTotal = minMaxPairs.stream()
+                .map(pair -> {
+                    System.out.println(pair[0] + "\t" + pair[1]);
+                    var res = findTotalOfOddDigitRepeatingNumbers(pair[0], pair[1]);
+                    var res2 = findTotalOfOddDigitRepeatingNumbersSlow(pair[0], pair[1]);
+                    System.out.println("Res1\t" + res);
+                    System.out.println("Res2\t" + res2);
+                    return res;
+                })
+                .reduce(0L, Long::sum);
+        var oddNumberSlowTotal = minMaxPairs.stream()
+                .map(pair -> findTotalOfOddDigitRepeatingNumbersSlow(pair[0], pair[1]))
+                .reduce(0L, Long::sum);
+        System.out.println("Slow result:\t" + result1);
+        System.out.println("Fast result:\t" + result2);
+        System.out.println("With odds:\t" + (oddNumberTotal));
+        System.out.println("Odds slow:\t" + oddNumberSlowTotal);
     }
 
-    public long findTotalOfRepeatingNumbersSlow(long min, long max) {
+    public long findTotalOfEvenDigitRepeatingNumbersSlow(long min, long max) {
         var res = 0L;
         for(long i = min; i <= max; i++) {
             var numOfDigits = (long)Math.floor(Math.log10(i)) + 1;
@@ -57,11 +72,7 @@ public class RepeatingNumbersProblem {
         return res;
     }
 
-    private long getNumberOfDigits(long number) {
-        return (long)Math.floor(Math.log10(number)) + 1;
-    }
-
-    public long findTotalOfRepeatingNumbersFast(long min, long max) {
+    public long findTotalOfEvenDigitRepeatingNumbersFast(long min, long max) {
         var minNumOfDigits = getNumberOfDigits(min);
         var maxNumOfDigits = getNumberOfDigits(max);
         if (maxNumOfDigits == 1) {
@@ -73,20 +84,24 @@ public class RepeatingNumbersProblem {
         var minHalfwaySeperator = minNumOfDigits > 1 ? (long)Math.pow(10, Math.ceilDiv(minNumOfDigits, 2)) : 1;
         var maxHalfwaySeperator = (long)Math.pow(10, Math.floorDiv(maxNumOfDigits, 2));
 
-        // Here if we have a number like 5170
-        // for 5100 we expect 5151 to exist however if the min is higher
-        // we can just increment it to 5200 as the new lower bound.
-        // Upper and lower bounds are represented as their unrepeated value e.g. 5252 is 52
-        // If the min had an odd number of digits we set it as the minimum value of number of digits plus 1 which is even
-        // We do the inverse for maximum
+
+        // If it is an odd number of digits we set the lower bound as the halfway seperator
+        // Ex. 123 becomes 10 since the next repeating digit after 123 is 1010.
         var lower_bound = minHalfwaySeperator;
         if (minNumOfDigits % 2 == 0) {
+            // Here if we have a number like 5170
+            // We first take the first half 51 we then check if the repeating number 5151 is smaller than min
+            // if it is we increment it by 1 to become 52 since 5252 is greater than the min.
+            // Upper and lower bounds are represented as their unrepeated value e.g. 5252 is 52
+            // If the min had an odd number of digits we set it as the minimum value of number of digits plus 1 which is even
+            // We do the inverse for maximum
             lower_bound = min / minHalfwaySeperator; // Strip top half
             if (lower_bound * minHalfwaySeperator + lower_bound < min) {
                 lower_bound += 1;
             }
         }
 
+        // We do inverse for max Ex. 123 becomes 9 because 99 is the next repeating digit less than 123
         var upper_bound = maxHalfwaySeperator - 1; // 10 becomes 9
         if (maxNumOfDigits % 2 == 0) {
             upper_bound = max / maxHalfwaySeperator;
@@ -111,6 +126,90 @@ public class RepeatingNumbersProblem {
         }
 
         return sumMinToMaxRepeatingNumbers;
+    }
+
+    public long findTotalOfOddDigitRepeatingNumbersSlow(long min, long max) {
+        var res = 0;
+        for(var i = min; i <= max; i++) {
+            var numDigits = getNumberOfDigits(i);
+            if (numDigits % 2 == 0 || numDigits == 1) {
+                continue;
+            }
+            if (i % getDigitsAsOnes(numDigits) == 0 ) {
+                res += i;
+            }
+        }
+        return res;
+    }
+
+    // For this given a min and a max find the sum of all the numbers with an odd number of digits
+    // That repeat like so
+    // 111, 22222, 3333333 they must all be the same digit and must have an odd number of digits
+    public long findTotalOfOddDigitRepeatingNumbers(long min, long max) {
+        // The number 1 by itself does not qualify as repeating so we have a minimum of 111
+        min = Math.max(111, min);
+
+        var minNumOfDigits = getNumberOfDigits(min);
+        var maxNumOfDigits = getNumberOfDigits(max);
+        if (maxNumOfDigits < 3) {
+            return 0;
+        }
+
+        // Get the first digit ex 532 is 5
+        var lower_bound = min / (long)Math.pow(10, minNumOfDigits - 1);
+        var upper_bound = max / (long)Math.pow(10, maxNumOfDigits - 1);
+
+        // If the number of digits is even we increase the number of digits and reset lower bound to 1
+        // Ex. A min of 13 becomes the lower bound of 111 because its the next nearest number
+        if (minNumOfDigits % 2 == 0) {
+            minNumOfDigits++;
+            lower_bound = 1;
+        }
+
+        if (maxNumOfDigits % 2 == 0) {
+            maxNumOfDigits--;
+            upper_bound = 9;
+        }
+
+        // At this point we know that the lower and upper bounds both have an odd number of digits
+        // now we need to check that they actually fit within the max and mins
+        // Check if lower_bound is in breach of min
+        if (lower_bound * getDigitsAsOnes(minNumOfDigits) < min) {
+            lower_bound++;
+            if (lower_bound == 10) {
+                lower_bound = 1;
+                minNumOfDigits += 2;
+            }
+        }
+
+        if (upper_bound * getDigitsAsOnes(maxNumOfDigits) > max) {
+            upper_bound--;
+            if (upper_bound == 0) {
+                upper_bound = 9;
+                maxNumOfDigits -= 2;
+            }
+        }
+
+        if (minNumOfDigits > maxNumOfDigits) {
+            return 0;
+        }
+        var total = 0;
+        for(var i = minNumOfDigits; i <= maxNumOfDigits; i+=2) {
+            var minForIteration = i == minNumOfDigits ? lower_bound : 1;
+            var maxForIteration = i == maxNumOfDigits ? upper_bound : 9;
+            total += calculateSumOfConsecutiveIntegers(minForIteration, maxForIteration) * getDigitsAsOnes(i);
+        }
+        return total;
+    }
+
+    // Given a number returns the number of digits 123 = 3, 2345 = 4
+    private long getNumberOfDigits(long number) {
+        return (long)Math.floor(Math.log10(number)) + 1;
+    }
+
+    // Given a number like 3 returns same number of digits as ones like 3 = 111, 4 = 1111.
+    private long getDigitsAsOnes(long numDigits) {
+        return ((long)Math.pow(10, numDigits) - 1) / 9;
     }
 
     private long calculateSumOfConsecutiveIntegers(long min, long max) {
