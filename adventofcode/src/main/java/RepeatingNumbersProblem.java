@@ -4,8 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * IDs are considered invalid if they repeat twice ex 1010, 123123, 99
@@ -13,6 +12,8 @@ import java.util.List;
  * Numbers must repeat twice and IDs cannot start with 0.
  */
 public class RepeatingNumbersProblem {
+
+    private static List<Long> PRIME_NUMBER_CACHE = new ArrayList<>(List.of(2L, 3L, 5L, 7L, 11L));
 
     private List<long[]> LoadTextFile() {
         try (InputStream in = RotationLockProblem.class.getResourceAsStream("/data/repeatingnumbers.txt")) {
@@ -31,31 +32,20 @@ public class RepeatingNumbersProblem {
     public void findTotalOfRepeatingNumbersInFile() {
         var minMaxPairs = LoadTextFile();
         var result1 = minMaxPairs.stream()
-                .map(pair -> findTotalOfEvenDigitRepeatingNumbersSlow(pair[0], pair[1]))
+                .map(pair -> findTotalOfNumbersRepeatingTwiceSlow(pair[0], pair[1]))
                 .reduce(0L, Long::sum);
         var result2 = minMaxPairs.stream()
-                .map(pair -> findTotalOfEvenDigitRepeatingNumbersFast(pair[0], pair[1]))
+                .map(pair -> findTotalOfNumbersRepeatingTwiceFast(pair[0], pair[1]))
                 .reduce(0L, Long::sum);
-        var oddNumberTotal = minMaxPairs.stream()
-                .map(pair -> {
-                    System.out.println(pair[0] + "\t" + pair[1]);
-                    var res = findTotalOfOddDigitRepeatingNumbers(pair[0], pair[1]);
-                    var res2 = findTotalOfOddDigitRepeatingNumbersSlow(pair[0], pair[1]);
-                    System.out.println("Res1\t" + res);
-                    System.out.println("Res2\t" + res2);
-                    return res;
-                })
-                .reduce(0L, Long::sum);
-        var oddNumberSlowTotal = minMaxPairs.stream()
-                .map(pair -> findTotalOfOddDigitRepeatingNumbersSlow(pair[0], pair[1]))
+        var result3 = minMaxPairs.stream()
+                .map(pair -> findTotalOfAnyRepeatingDigit(pair[0], pair[1]))
                 .reduce(0L, Long::sum);
         System.out.println("Slow result:\t" + result1);
         System.out.println("Fast result:\t" + result2);
-        System.out.println("With odds:\t" + (oddNumberTotal));
-        System.out.println("Odds slow:\t" + oddNumberSlowTotal);
+        System.out.println("Any Repeating Pattern:\t" + result3);
     }
 
-    public long findTotalOfEvenDigitRepeatingNumbersSlow(long min, long max) {
+    public long findTotalOfNumbersRepeatingTwiceSlow(long min, long max) {
         var res = 0L;
         for(long i = min; i <= max; i++) {
             var numOfDigits = (long)Math.floor(Math.log10(i)) + 1;
@@ -72,7 +62,7 @@ public class RepeatingNumbersProblem {
         return res;
     }
 
-    public long findTotalOfEvenDigitRepeatingNumbersFast(long min, long max) {
+    public long findTotalOfNumbersRepeatingTwiceFast(long min, long max) {
         var minNumOfDigits = getNumberOfDigits(min);
         var maxNumOfDigits = getNumberOfDigits(max);
         if (maxNumOfDigits == 1) {
@@ -128,92 +118,136 @@ public class RepeatingNumbersProblem {
         return sumMinToMaxRepeatingNumbers;
     }
 
-    public long findTotalOfOddDigitRepeatingNumbersSlow(long min, long max) {
-        var res = 0;
-        for(var i = min; i <= max; i++) {
-            var numDigits = getNumberOfDigits(i);
-            if (numDigits % 2 == 0 || numDigits == 1) {
-                continue;
-            }
-            if (i % getDigitsAsOnes(numDigits) == 0 ) {
-                res += i;
-            }
-        }
-        return res;
-    }
 
-    // For this given a min and a max find the sum of all the numbers with an odd number of digits
-    // That repeat like so
-    // 111, 22222, 3333333 they must all be the same digit and must have an odd number of digits
-    public long findTotalOfOddDigitRepeatingNumbers(long min, long max) {
-        // The number 1 by itself does not qualify as repeating so we have a minimum of 111
-        min = Math.max(111, min);
-
-        var minNumOfDigits = getNumberOfDigits(min);
-        var maxNumOfDigits = getNumberOfDigits(max);
-        if (maxNumOfDigits < 3) {
-            return 0;
-        }
-
-        // Get the first digit ex 532 is 5
-        var lower_bound = min / (long)Math.pow(10, minNumOfDigits - 1);
-        var upper_bound = max / (long)Math.pow(10, maxNumOfDigits - 1);
-
-        // If the number of digits is even we increase the number of digits and reset lower bound to 1
-        // Ex. A min of 13 becomes the lower bound of 111 because its the next nearest number
-        if (minNumOfDigits % 2 == 0) {
-            minNumOfDigits++;
-            lower_bound = 1;
-        }
-
-        if (maxNumOfDigits % 2 == 0) {
-            maxNumOfDigits--;
-            upper_bound = 9;
-        }
-
-        // At this point we know that the lower and upper bounds both have an odd number of digits
-        // now we need to check that they actually fit within the max and mins
-        // Check if lower_bound is in breach of min
-        if (lower_bound * getDigitsAsOnes(minNumOfDigits) < min) {
-            lower_bound++;
-            if (lower_bound == 10) {
-                lower_bound = 1;
-                minNumOfDigits += 2;
-            }
-        }
-
-        if (upper_bound * getDigitsAsOnes(maxNumOfDigits) > max) {
-            upper_bound--;
-            if (upper_bound == 0) {
-                upper_bound = 9;
-                maxNumOfDigits -= 2;
-            }
-        }
-
-        if (minNumOfDigits > maxNumOfDigits) {
-            return 0;
-        }
-        var total = 0;
-        for(var i = minNumOfDigits; i <= maxNumOfDigits; i+=2) {
-            var minForIteration = i == minNumOfDigits ? lower_bound : 1;
-            var maxForIteration = i == maxNumOfDigits ? upper_bound : 9;
-            total += calculateSumOfConsecutiveIntegers(minForIteration, maxForIteration) * getDigitsAsOnes(i);
+    // Find given a max and min number the sum of all numbers that have repeating digits of any kind
+    // So, 12341234 (1234 two times), 123123123 (123 three times), 1212121212 (12 five times), and 1111111 (1 seven times) are all counted.
+    public long findTotalOfAnyRepeatingDigit(long min, long max) {
+        var minNumDigits = getNumberOfDigits(min);
+        var maxNumDigits = getNumberOfDigits(max);
+        var total = -totalOfRepeatingNumbersWithSameNumberOfDigits(min - 1);
+        for(var i = minNumDigits; i <= maxNumDigits; i++) {
+            var maxValue = maxNumDigits == i ? max : (long)Math.pow(10, i) - 1;
+            total += totalOfRepeatingNumbersWithSameNumberOfDigits(maxValue);
         }
         return total;
     }
 
-    // Given a number returns the number of digits 123 = 3, 2345 = 4
+    // Given a N digit number such as 123456 we want to now find all the
+    // Repeating numbers between 100000 and that number. We do this by finding the factors in this case 1,2,3
+    // then creating a window which we use to find the smallest number
+    // Ex. 123456
+    // 1 = [1,2,3,4,5,6] = 1 is the smallest
+    // 2 = [12, 34, 56] = 12 is the smallest
+    // 3 = [123, 456] = 123 is the smallest
+    // Given a number we can extrapolate n - 10^(floor(log10(n)) - 1) + 1
+    // In this case 12 => 12 - 10 + 1 = 3 numbers 121212, 111111, 101010
+    // Another example 223 => 223 - 100 + 1 = 124 numbers
+    public long totalOfRepeatingNumbersWithSameNumberOfDigits(long number) {
+        var numDigits = getNumberOfDigits(number);
+        var factors = getFactors(numDigits);
+        if (numDigits < 2) {
+            return 0;
+        }
+        factors.add(1L); // Can't forget 1
+        var sum_of_all_patterns = factors.stream()
+            .map(factor -> {
+                var upper_bound = number/(long)Math.pow(10, numDigits - factor);
+
+                if (buildNumber(upper_bound, factor, numDigits / factor) > number) {
+                    upper_bound--;
+                }
+
+                if (getNumberOfDigits(upper_bound) != factor) {
+                    return 0L;
+                }
+
+                var sum = calculateSumOfConsecutiveIntegers((long)Math.pow(10, factor - 1), upper_bound);
+                return buildNumber(sum, factor, numDigits / factor);
+            }).toList();
+        var sum_of_all_patterns_list = new ArrayList<>(sum_of_all_patterns);
+
+        // Here we have the unfortunate scenario of double counting
+        // for example 222222 is also 2 2 2 2 2 2 or 22 22 22 22 22 22 or 222 222 and is counted multiple times
+        // we get rid of this by subtracting factors from the count
+        for(var i = 0; i < factors.size(); i++) {
+            for(var j = 0; j < i; j++) {
+                if (factors.get(i) % factors.get(j) == 0) {
+                    sum_of_all_patterns_list.set(i, sum_of_all_patterns.get(i) - sum_of_all_patterns.get(j));
+                }
+            }
+        }
+
+        var repeating_numbers = new HashSet<Long>();
+        factors.stream().forEach(factor -> {
+            var upper_bound = number/(long)Math.pow(10, numDigits - factor);
+            if (buildNumber(upper_bound, factor, numDigits / factor) > number) {
+                upper_bound--;
+            }
+            if (getNumberOfDigits(upper_bound) != factor) {
+                return;
+            }
+            for(var i = (long)Math.pow(10, factor - 1); i <= upper_bound; i++) {
+                repeating_numbers.add(buildNumber(i, factor, numDigits / factor));
+            }
+        });
+
+        var alt = repeating_numbers.stream().reduce(0L, Long::sum);
+        var result = sum_of_all_patterns_list.stream().reduce(0L, Long::sum);
+        return alt;
+    }
+
+    public long buildNumber(long number, long numDigits, long count) {
+        var result = 0L;
+        for(var i = 0; i < count; i++) {
+            result += number * (long)Math.pow(10, i * numDigits);
+        }
+        return result;
+    }
+
+    // Returns a list of the prime factors of a given number
+    // Ex. 21 = [3,7]         I know 1 is technically not a prime number
+    private List<Long> getFactors(long number) {
+        var factor_list = new ArrayList<Long>();
+
+        // If half the number is bigger than our prime cache we need to generate prime numbers up
+        // to half the number because they can be potential factors
+        if (number / 2 > PRIME_NUMBER_CACHE.get(PRIME_NUMBER_CACHE.size() - 1)) {
+            generatePrimesForCache(number / 2);
+        }
+
+        for (var prime : PRIME_NUMBER_CACHE) {
+            if (number % prime == 0 && number != prime) {
+                factor_list.add(prime);
+                factor_list.add(number/prime);
+            }
+        }
+        return new ArrayList<>(factor_list.stream().distinct().toList());
+    }
+
+    private void generatePrimesForCache(long max_value) {
+        var current_max = PRIME_NUMBER_CACHE.get(PRIME_NUMBER_CACHE.size() - 1);
+        for (var i = current_max; i <= max_value; i += 2) {
+            boolean isPrime = true;
+            for(var prime : PRIME_NUMBER_CACHE) {
+                if (i % prime == 0) {
+                    isPrime = false;
+                    break;
+                }
+            }
+            if (isPrime) {
+                PRIME_NUMBER_CACHE.add(i);
+            }
+        }
+    }
+
+    // Given a number this returns the number of digits 123 = 3, 2345 = 4
     private long getNumberOfDigits(long number) {
         return (long)Math.floor(Math.log10(number)) + 1;
     }
 
-    // Given a number like 3 returns same number of digits as ones like 3 = 111, 4 = 1111.
-    private long getDigitsAsOnes(long numDigits) {
-        return ((long)Math.pow(10, numDigits) - 1) / 9;
-    }
 
-    private long calculateSumOfConsecutiveIntegers(long min, long max) {
-        var average = (max + min) / 2.0f;
-        return Math.round(average * (max - min + 1));
+    public long calculateSumOfConsecutiveIntegers(long min, long max) {
+        var average = (max + min) / 2.0;
+        return (long)(average * (max - min + 1));
     }
 }
