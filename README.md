@@ -35,7 +35,7 @@ This repo is me working through the 2025 event for fun and practice. Expect a mi
 | 06  | ⭐      | ⭐⭐     |
 | 07  | ⭐      | ⭐⭐     |
 | 08  | ⭐      | ⭐⭐     |
-| 09  |       |        |
+| 09  | ⭐      | ⭐⭐     |
 | 10  |       |        |
 | 11  |       |        |
 | 12  |       |        |
