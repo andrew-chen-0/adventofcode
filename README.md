@@ -21,7 +21,6 @@ This repo is me working through the 2025 event for fun and practice. Expect a mi
 2. Rename as the appropriate `input.txt` (take a look in the code).  
 3. Run the day’s solution.
 
-Because setups vary a bit across days, check the top of each file (or any per-day notes) for the exact entry point.
 ---
 
 ## Progress
@@ -35,7 +34,7 @@ Because setups vary a bit across days, check the top of each file (or any per-da
 | 05  | ⭐      | ⭐⭐     |
 | 06  | ⭐      | ⭐⭐     |
 | 07  | ⭐      | ⭐⭐     |
-| 08  |       |        |
+| 08  | ⭐      | ⭐⭐     |
 | 09  |       |        |
 | 10  |       |        |
 | 11  |       |        |
