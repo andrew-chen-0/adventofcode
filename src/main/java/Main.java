@@ -39,7 +39,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         var day = args.length > 0 ? Integer.parseInt(args[0]) : 9;
         var filename = args.length > 1 ? args[1] : null;
-        var useExample = args.length > 2 ? Boolean.parseBoolean(args[1]) : false;
+        var useExample = args.length > 2 && Boolean.parseBoolean(args[2]);
         var problem = AOC_DAY_TO_PROBLEM(filename, useExample).get(day);
 
         System.out.println("Part1:\t" + timeFunction((t) -> problem.solvePart1()));

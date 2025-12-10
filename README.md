@@ -114,25 +114,6 @@ Part2:  <answer>
 
 ---
 
-**Note:** in your snippet, `useExample` is parsed from `args[1]` instead of `args[2]`. If that’s not deliberate, change:
-
-```java
-var useExample = args.length > 2 ? Boolean.parseBoolean(args[1]) : false;
-```
-
-to:
-
-```java
-var useExample = args.length > 2 ? Boolean.parseBoolean(args[2]) : false;
-```
-
----
-
-If your actual main class name isn’t `Main`, tell me what it is and I’ll swap it in.
-
-
----
-
 ## Credits
 
 Advent of Code is created and maintained by **Eric Wastl**, with support from sponsors, beta testers, and the community.  
