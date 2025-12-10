@@ -1,4 +1,4 @@
-package main.java.utilities;
+package com.adventofcode.utilities;
 
 public class Edge {
     Node A;

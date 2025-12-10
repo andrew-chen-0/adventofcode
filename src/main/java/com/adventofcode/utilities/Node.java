@@ -1,4 +1,4 @@
-package main.java.utilities;
+package com.adventofcode.utilities;
 
 import java.util.List;
 

@@ -1,8 +1,8 @@
-package main.java.problems;
+package com.adventofcode.problems;
 
-import main.java.utilities.CoordinatesHashing;
-import main.java.utilities.Node;
-import main.java.utilities.Rectangle;
+import com.adventofcode.utilities.CoordinatesHashing;
+import com.adventofcode.utilities.Node;
+import com.adventofcode.utilities.Rectangle;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

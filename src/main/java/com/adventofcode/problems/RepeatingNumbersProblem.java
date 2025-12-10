@@ -1,4 +1,4 @@
-package main.java.problems;
+package com.adventofcode.problems;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

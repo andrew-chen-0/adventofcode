@@ -18,7 +18,7 @@ dependencies {
 }
 
 application {
-    mainClass = 'main.java.Main'
+    mainClass = 'com.adventofcode.Main'
 }
 
 java {

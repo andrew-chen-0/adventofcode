@@ -1,6 +1,6 @@
-package main.java;
+package com.adventofcode;
 
-import main.java.problems.*;
+import com.adventofcode.problems.*;
 
 import java.util.Map;
 import java.util.function.Function;

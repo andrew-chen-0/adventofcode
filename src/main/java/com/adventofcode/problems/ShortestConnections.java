@@ -1,7 +1,7 @@
-package main.java.problems;
+package com.adventofcode.problems;
 
-import main.java.utilities.Edge;
-import main.java.utilities.Node;
+import com.adventofcode.utilities.Edge;
+import com.adventofcode.utilities.Node;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
