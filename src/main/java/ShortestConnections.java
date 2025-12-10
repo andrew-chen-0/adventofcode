@@ -1,5 +1,8 @@
 package main.java;
 
+import main.java.utilities.Edge;
+import main.java.utilities.Node;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,50 +11,8 @@ import java.util.*;
 
 public class ShortestConnections {
 
-    class Edge {
-        Node A;
-        Node B;
-
-        double distance;
-
-        public Edge(Node A, Node B) {
-            this.A = A;
-            this.B = B;
-        }
-
-        public Edge(Node A, Node B, double distance) {
-            this.A = A;
-            this.B = B;
-            this.distance = distance;
-        }
-
-        @Override
-        public int hashCode() {
-            return A.coordinates.get(0) * B.coordinates.get(0) +
-                    A.coordinates.get(1) * B.coordinates.get(1) +
-                    A.coordinates.get(2) * B.coordinates.get(2);
-        }
-    }
-
-    class Node {
-        List<Integer> coordinates;
-
-        public Node(List<Integer> coordinates) {
-            this.coordinates = coordinates;
-        }
-
-
-        public Edge createEdge(Node node) {
-            var distance = Math.sqrt(Math.pow(coordinates.get(0) - node.coordinates.get(0), 2) +
-                    Math.pow(coordinates.get(1) - node.coordinates.get(1), 2) +
-                    Math.pow(coordinates.get(2) - node.coordinates.get(2), 2));
-
-            return new Edge(this, node, distance);
-        }
-    }
-
     boolean useExample = false;
-    private ArrayList<List<Integer>> LoadTextFile() {
+    private ArrayList<List<Long>> LoadTextFile() {
         try (InputStream in = RotationLockProblem.class.getResourceAsStream("/data/shortestconnection" + (useExample ? "example" : "") + ".txt")) {
             if (in == null) throw new FileNotFoundException("Resource not found");
 
@@ -60,11 +21,11 @@ public class ShortestConnections {
             var rangeList = new ArrayList<RangesProblem.Range>();
             var inputsToCheck = new ArrayList<Long>();
             var lines = content.split("\r\n");
-            var fullMap = new ArrayList<List<Integer>>();
+            var fullMap = new ArrayList<List<Long>>();
 
             for (var line : lines) {
                 var coordinates = line.split(",");
-                fullMap.add(Arrays.stream(coordinates).map(s -> Integer.parseInt(s)).toList());
+                fullMap.add(Arrays.stream(coordinates).map(Long::parseLong).toList());
             }
             return fullMap;
 
@@ -74,8 +35,8 @@ public class ShortestConnections {
     }
 
 
-    private HashSet<Edge> ConstructTree(ArrayList<List<Integer>> coordinates) {
-        var nodes = coordinates.stream().map(c -> new Node(c)).toList();
+    private HashSet<Edge> ConstructTree(ArrayList<List<Long>> coordinates) {
+        var nodes = coordinates.stream().map(Node::new).toList();
         var graph = new HashSet<Edge>();
         var hashCodeCheck = new HashSet<Integer>();
 
@@ -88,7 +49,7 @@ public class ShortestConnections {
 
                 // Here we use the hash code to check if the Edge already exists in the map regardless of direction A->B or B->A
                 if (!hashCodeCheck.contains(tempEdge.hashCode())) {
-                    var edge = node.createEdge(comparisonNode);
+                    var edge = new Edge(node, comparisonNode);
                     graph.add(edge);
                     hashCodeCheck.add(edge.hashCode());
                 }
@@ -100,6 +61,7 @@ public class ShortestConnections {
 
     // In this solution we want to find the distances between all of the nodes
     // We then sort based on the distances and construct the trees according to the nodes within them
+    // Answer: 123234
     public Long solvePart1() {
         var data = LoadTextFile();
         var graph = ConstructTree(data);
@@ -107,11 +69,11 @@ public class ShortestConnections {
         HashSet<Node> seenNodes = new HashSet<>();
         List<HashSet<Node>> trees = new ArrayList<>();
 
-        var sortedGraph = graph.stream().sorted((edge1, edge2) -> edge1.distance < edge2.distance ? -1 : 1).toList();
+        var sortedGraph = graph.stream().sorted(Comparator.comparingDouble(Edge::getDistance)).toList();
         for(var i = 0; i < sortedGraph.size() && i < numConnections; i++) {
             var edge = sortedGraph.get(i);
-            var nodeA = edge.A;
-            var nodeB = edge.B;
+            var nodeA = edge.getA();
+            var nodeB = edge.getB();
 
             // There are three cases we want to address
             // 1. The nodes are new and have not been added to the map
@@ -156,7 +118,7 @@ public class ShortestConnections {
             seenNodes.add(nodeB);
         }
 
-        trees.sort((set1, set2) -> set1.size() == set2.size() ? 0 : set1.size() > set2.size() ? -1 : 1);
+        trees.sort((set1, set2) -> Integer.compare(set2.size(), set1.size()));
 
 
         return (long)trees.get(0).size() * (long)trees.get(1).size() * (long)trees.get(2).size();
@@ -164,6 +126,7 @@ public class ShortestConnections {
 
     // Part 2 is the same as Part 1 we however instead of just 1000 shortest connections
     // we allow the tree to run to completion and use the last edge to be added to the tree to do some math with the nodes.
+    // Answer: 9259958565
     public Long solvePart2() {
         var data = LoadTextFile();
         var graph = ConstructTree(data);
@@ -172,13 +135,13 @@ public class ShortestConnections {
 
 
 
-        var sortedGraph = graph.stream().sorted((edge1, edge2) -> edge1.distance < edge2.distance ? -1 : 1).toList();
+        var sortedGraph = graph.stream().sorted(Comparator.comparingDouble(Edge::getDistance)).toList();
         var lastEdge = sortedGraph.get(0);
 
         for(var i = 0; i < sortedGraph.size(); i++) {
             var edge = sortedGraph.get(i);
-            var nodeA = edge.A;
-            var nodeB = edge.B;
+            var nodeA = edge.getA();
+            var nodeB = edge.getB();
 
             // If the nodes are not found in the tree we start making a new connection
             if (!seenNodes.contains(nodeA) && !seenNodes.contains(nodeB)) {
@@ -220,7 +183,7 @@ public class ShortestConnections {
             seenNodes.add(nodeB);
         }
 
-        return (long)((long)lastEdge.A.coordinates.get(0) * (long)lastEdge.B.coordinates.get(0));
+        return (long)((long)lastEdge.getA().getX() * (long)lastEdge.getB().getX());
     }
 
 

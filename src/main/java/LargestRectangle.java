@@ -1,5 +1,9 @@
 package main.java;
 
+import main.java.utilities.Edge;
+import main.java.utilities.Node;
+import main.java.utilities.Rectangle;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,76 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class LargestRectangle {
-
-    class Rectangle {
-        Node A;
-        Node B;
-        Node OptionalNode;
-
-        double area;
-
-        public Rectangle(Node A, Node B) {
-            this.A = A;
-            this.B = B;
-            this.area = (long)(Math.abs(A.coordinates.get(0) - B.coordinates.get(0)) + 1) * (long)(Math.abs(A.coordinates.get(1) - B.coordinates.get(1)) + 1);
-        }
-
-        public Rectangle(Node A, Node B, double area) {
-            this.A = A;
-            this.B = B;
-            this.area = area;
-        }
-
-        @Override
-        public int hashCode() {
-            return (int)(A.coordinates.get(0) * B.coordinates.get(0) +
-                    A.coordinates.get(1) * B.coordinates.get(1));
-        }
-        public boolean withinDimension(int dimension, Node node) {
-            var min = Math.min(this.A.coordinates.get(dimension), this.B.coordinates.get(dimension));
-            var max = Math.max(this.A.coordinates.get(dimension), this.B.coordinates.get(dimension));
-            var pos = node.coordinates.get(dimension);
-            return min <= pos && max >= pos;
-        }
-
-        public boolean withinRectangle(Node node) {
-            return withinDimension(0, node) && withinDimension(1, node);
-        }
-
-        public ArrayList<Node> getSquares() {
-            var minX = Math.min(this.A.coordinates.get(0), this.B.coordinates.get(0));
-            var maxX = Math.max(this.A.coordinates.get(0), this.B.coordinates.get(0));
-            var minY = Math.min(this.A.coordinates.get(1), this.B.coordinates.get(1));
-            var maxY = Math.max(this.A.coordinates.get(1), this.B.coordinates.get(1));
-
-            var arr = new ArrayList<Node>();
-            for (var i = minX; i <= maxX; i++) {
-                for (var j = minY; j <= maxY; j++) {
-                    arr.add(new Node(List.of(i, j)));
-                }
-            }
-            return arr;
-        }
-
-        public ArrayList<Node> getAllCorners() {
-            var minX = Math.min(this.A.coordinates.get(0), this.B.coordinates.get(0));
-            var maxX = Math.max(this.A.coordinates.get(0), this.B.coordinates.get(0));
-            var minY = Math.min(this.A.coordinates.get(1), this.B.coordinates.get(1));
-            var maxY = Math.max(this.A.coordinates.get(1), this.B.coordinates.get(1));
-
-            var arr = new ArrayList<Node>();
-            arr.add(new Node(List.of(minX, minY)));
-            arr.add(new Node(List.of(minX, maxY)));
-            arr.add(new Node(List.of(maxX, minY)));
-            arr.add(new Node(List.of(maxX, maxY)));
-            return arr;
-        }
-
-        public boolean equalsDimension(int dimension, Node node) {
-            var pos = node.coordinates.get(dimension);
-            return this.A.coordinates.get(dimension) == pos || this.B.coordinates.get(dimension) == pos;
-        }
-    }
 
     // A class to define an outside perimeter of the shape efficiently
     class OutsidePerimeter {
@@ -91,11 +25,11 @@ public class LargestRectangle {
         //   rectangles the perimeters are guaranteed to be orthogonal to any red squares which are also used to define the path.
         public OutsidePerimeter(List<Node> data, int direction) {
             var newDirection = 0L;
-            var point0 = data.get(data.size() - 1).coordinates;
-            var point1 = data.get(0).coordinates;
+            var point0 = data.get(data.size() - 1).getCoordinates();
+            var point1 = data.get(0).getCoordinates();
             for (var i = 1; i < data.size() + 1; i++) {
                 var j = i % data.size();
-                var point2 = data.get(j).coordinates;
+                var point2 = data.get(j).getCoordinates();
                 var dimension = point2.get(0) - point1.get(0) == 0 ? 1 : 0;
 
                 var increment = (point2.get(dimension) - point1.get(dimension)) / Math.abs((point2.get(dimension) - point1.get(dimension)));
@@ -186,10 +120,12 @@ public class LargestRectangle {
         }
 
         public boolean collidesWithPerimeter(Rectangle rectangle) {
-            var minX = Math.min(rectangle.A.getX(), rectangle.B.getX());
-            var maxX = Math.max(rectangle.A.getX(), rectangle.B.getX());
-            var minY = Math.min(rectangle.A.getY(), rectangle.B.getY());
-            var maxY = Math.max(rectangle.A.getY(), rectangle.B.getY());
+            var nodeA = rectangle.getA();
+            var nodeB = rectangle.getB();
+            var minX = Math.min(nodeA.getX(), nodeB.getX());
+            var maxX = Math.max(nodeA.getX(), nodeB.getX());
+            var minY = Math.min(nodeA.getY(), nodeB.getY());
+            var maxY = Math.max(nodeA.getY(), nodeB.getY());
 
             // Test the four lines that make the perimeter of the rectangle to see if
             // we have any outer perimeter collisions
@@ -198,22 +134,6 @@ public class LargestRectangle {
                     collidesWithLine(false, minY, minX, maxX) ||
                     collidesWithLine(false, maxY, minX, maxX);
             return result;
-        }
-    }
-
-    class Node {
-        List<Long> coordinates;
-
-        public Node(List<Long> coordinates) {
-            this.coordinates = coordinates;
-        }
-
-        public Long getX() {
-            return this.coordinates.get(0);
-        }
-
-        public Long getY() {
-            return this.coordinates.get(1);
         }
     }
 
@@ -272,8 +192,8 @@ public class LargestRectangle {
         HashSet<Node> seenNodes = new HashSet<>();
         List<HashSet<Node>> trees = new ArrayList<>();
 
-        var sortedGraph = graph.stream().sorted((rectangle1, rectangle2) -> rectangle1.area < rectangle2.area ? -1 : 1).toList();
-        return (long)sortedGraph.get(sortedGraph.size() - 1).area;
+        var sortedGraph = graph.stream().sorted(Comparator.comparingDouble(Rectangle::getArea)).toList();
+        return (long)sortedGraph.get(sortedGraph.size() - 1).getArea();
     }
 
     // Convert our positional coordinates to a vector from point1 to point2
@@ -315,6 +235,8 @@ public class LargestRectangle {
         return direction;
     }
 
+
+    // Answer: 1479665889
     public Long solvePart2() {
         var data = LoadTextFile().stream().map(c -> new Node(c)).toList();
         var direction = getDirectionOfPath(data);
@@ -330,13 +252,13 @@ public class LargestRectangle {
                     continue;
                 }
                 var tempRect = new Rectangle(point, point2);
-                if (tempRect.area <= largestArea) {
+                if (tempRect.getArea() <= largestArea) {
                     continue;
                 }
 
                 var hitPerimeter = outsidePerimeter.collidesWithPerimeter(tempRect);
                 if (!hitPerimeter) {
-                    largestArea = (long)tempRect.area;
+                    largestArea = (long)tempRect.getArea();
                 }
 
                 seenPoints.add(coordinatesHashCode);
