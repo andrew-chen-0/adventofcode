@@ -190,6 +190,22 @@ public class JoltageConfigurationProblem extends AdventOfCode{
         int numCounters = machine.joltage.size();
         
         try {
+            // How an Integer Linear Program Solver works:
+            // 1. Solve the continuous relaxation Ax = c (ignoring integer constraints) using
+            //    methods like SVD, Simplex, or Interior Point algorithms
+            // 2. This gives a continuous solution with possibly fractional/negative values
+            //    like x = [-1.2, 2.4, 3.0, ...]
+            // 3. Branch-and-bound algorithm:
+            //    a. Pick a fractional variable (e.g., x[1] = 2.4)
+            //    b. Create two branches:
+            //       - Branch A: Add constraint x[1] ≤ 2, solve the full system again (Simplex Method which allows for additional constraints)
+            //       - Branch B: Add constraint x[1] ≥ 3, solve the full system again
+            //    c. If a branch gives negative values that violate x ≥ 0, that branch
+            //       becomes infeasible and is pruned
+            //    d. Recursively branch on remaining fractional variables in each branch
+            // 4. Return the integer solution with minimum objective value (fewest presses)
+            // 5. For this problem, a valid integer solution is guaranteed to exist
+
             // Create the optimization model
             ExpressionsBasedModel model = new ExpressionsBasedModel();
             
