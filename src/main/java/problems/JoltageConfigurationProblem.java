@@ -28,7 +28,10 @@ import org.ojalgo.optimisation.Variable;
  * 
  * Part 2: Joltage Counter Configuration (Main Challenge)
  * I tried a DFS search but it took too long.
- * I realized that this is a matrix optimization problem where Ax=C where A is the ve
+ * I realized that this is a matrix optimization problem where Ax=C where A is the matrix formed by
+ * the binary vectors of the light switches and C is the resulting joltage vector.
+ * We also have to add the constraints on x that all numbers are integers and are positive.
+ * Also we want to minimize x.
  */
 public class JoltageConfigurationProblem extends AdventOfCode{
 
