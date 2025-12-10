@@ -59,7 +59,7 @@ public class RepeatingNumbersProblem extends AdventOfCode {
 
         // 4365 becomes 4 which becomes 10^2 which can be used to seperate 43 and 65
         // Also for an odd number of digits it means we push the exponent to the nearest even number
-        var minHalfwaySeperator = minNumOfDigits > 1 ? (long)Math.pow(10, Math.ceilDiv(minNumOfDigits, 2)) : 1;
+        var minHalfwaySeperator = minNumOfDigits > 1 ? (long)Math.pow(10, (minNumOfDigits + 1) / 2) : 1;
         var maxHalfwaySeperator = (long)Math.pow(10, Math.floorDiv(maxNumOfDigits, 2));
 
 

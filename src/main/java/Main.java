@@ -21,7 +21,8 @@ public class Main {
                 6, new MathOperationsProblem(useDefaultIfNull(filename, "mathproblem.txt"), useExample),
                 7, new BeamSplit(useDefaultIfNull(filename, "beamsplit.txt"), useExample),
                 8, new ShortestConnections(useDefaultIfNull(filename, "shortestconnection.txt"), useExample),
-                9, new LargestRectangle(useDefaultIfNull(filename, "largestrectangle.txt"), useExample)
+                9, new LargestRectangle(useDefaultIfNull(filename, "largestrectangle.txt"), useExample),
+                10, new JoltageConfigurationProblem(useDefaultIfNull(filename, "dfs.txt"), useExample)
 
         );
     }
@@ -37,9 +38,12 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        var day = args.length > 0 ? Integer.parseInt(args[0]) : 9;
+        var day = args.length > 0 ? Integer.parseInt(args[0]) : 1;
         var filename = args.length > 1 ? args[1] : null;
         var useExample = args.length > 2 && Boolean.parseBoolean(args[2]);
+
+        day = 10;
+        useExample = false;
         var problem = AOC_DAY_TO_PROBLEM(filename, useExample).get(day);
 
         System.out.println("Part1:\t" + timeFunction((t) -> problem.solvePart1()));
