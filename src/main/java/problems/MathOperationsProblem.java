@@ -1,4 +1,4 @@
-package main.java;
+package main.java.problems;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -7,7 +7,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class MathOperationsProblem {
+public class MathOperationsProblem extends AdventOfCode {
+
+    public MathOperationsProblem(String filename, boolean useExample) {
+        super(filename, useExample);
+    }
 
     class OperateNumber {
 
@@ -72,7 +76,7 @@ public class MathOperationsProblem {
 
     boolean useExample = false;
     private OperateNumber LoadTextFile() {
-        try (InputStream in = RotationLockProblem.class.getResourceAsStream("/data/mathproblem" + (useExample ? "example" : "") + ".txt")) {
+        try (InputStream in = ReadFile()) {
             if (in == null) throw new FileNotFoundException("Resource not found");
 
             var content = new String(in.readAllBytes(), StandardCharsets.UTF_8);
@@ -105,11 +109,15 @@ public class MathOperationsProblem {
         }
     }
 
-    public Long solvePart1() throws Exception {
+    public Long solvePart1() {
         var operateNumber = LoadTextFile();
         var res = 0L;
         for(var i = 0; i < operateNumber.size(); i++) {
-            res += operateNumber.performOperation(i);
+            try {
+                res += operateNumber.performOperation(i);
+            } catch(Exception ex) {
+                System.out.println(ex.getMessage());
+            }
         }
         return res;
     }

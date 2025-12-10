@@ -1,6 +1,6 @@
-package main.java;
+package main.java.problems;
 
-import main.java.utilities.Edge;
+import main.java.utilities.CoordinatesHashing;
 import main.java.utilities.Node;
 import main.java.utilities.Rectangle;
 
@@ -10,7 +10,11 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public class LargestRectangle {
+public class LargestRectangle extends AdventOfCode {
+
+    public LargestRectangle(String filename, boolean useExample) {
+        super(filename, useExample);
+    }
 
     // A class to define an outside perimeter of the shape efficiently
     class OutsidePerimeter {
@@ -129,17 +133,16 @@ public class LargestRectangle {
 
             // Test the four lines that make the perimeter of the rectangle to see if
             // we have any outer perimeter collisions
-            var result = collidesWithLine(true, minX, minY, maxY) ||
+            return collidesWithLine(true, minX, minY, maxY) ||
                     collidesWithLine(true, maxX, minY, maxY) ||
                     collidesWithLine(false, minY, minX, maxX) ||
                     collidesWithLine(false, maxY, minX, maxX);
-            return result;
         }
     }
 
     boolean useExample = false;
     private ArrayList<List<Long>> LoadTextFile() {
-        try (InputStream in = RotationLockProblem.class.getResourceAsStream("/data/largestrectangle" + (useExample ? "example" : "") + ".txt")) {
+        try (InputStream in = ReadFile()) {
             if (in == null) throw new FileNotFoundException("Resource not found");
 
             var content = new String(in.readAllBytes(), StandardCharsets.UTF_8);
@@ -149,7 +152,7 @@ public class LargestRectangle {
             for (var line : lines) {
                 var coordinates = line.split(",");
 //                var reverseCoordinates = new String[] { coordinates[1], coordinates[0] };
-                fullMap.add(Arrays.stream(coordinates).map(s -> Long.parseLong(s)).toList());
+                fullMap.add(Arrays.stream(coordinates).map(Long::parseLong).toList());
             }
             return fullMap;
 
@@ -160,7 +163,7 @@ public class LargestRectangle {
 
 
     private HashSet<Rectangle> ConstructTree(ArrayList<List<Long>> coordinates) {
-        var nodes = coordinates.stream().map(c -> new Node(c)).toList();
+        var nodes = coordinates.stream().map(Node::new).toList();
         var graph = new HashSet<Rectangle>();
         var hashCodeCheck = new HashSet<Integer>();
 
@@ -183,7 +186,7 @@ public class LargestRectangle {
 
     }
 
-    // In this solution we want to find the distances between all of the nodes
+    // In this solution we want to find the distances between all the nodes
     // We then sort based on the distances and construct the trees according to the nodes within them
     public Long solvePart1() {
         var data = LoadTextFile();
@@ -238,13 +241,12 @@ public class LargestRectangle {
 
     // Answer: 1479665889
     public Long solvePart2() {
-        var data = LoadTextFile().stream().map(c -> new Node(c)).toList();
+        var data = LoadTextFile().stream().map(Node::new).toList();
         var direction = getDirectionOfPath(data);
         var outsidePerimeter = new OutsidePerimeter(data, direction);
 
         var largestArea = 0L;
         var seenPoints =  new HashSet<Long>();
-        long start = System.nanoTime();
         for(var point: data) {
             for(var point2: data) {
                 var coordinatesHashCode = CoordinatesHashing.hashUnordered(point.getX().intValue(), point.getY().intValue(), point2.getX().intValue(), point2.getY().intValue());
@@ -266,12 +268,6 @@ public class LargestRectangle {
 
 
         }
-        long end = System.nanoTime();
-        long durationNs = end - start;
-        double durationMs = (durationNs / 1_000_000.0);
-        System.out.println("Duration:\t" + durationMs + "ms");
-
-
         return largestArea;
     }
 

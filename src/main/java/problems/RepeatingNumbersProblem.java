@@ -1,4 +1,4 @@
-package main.java;
+package main.java.problems;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -11,12 +11,16 @@ import java.util.*;
  * You are given a min and a max number inclusive. Find the sum of all the invalid IDs
  * Numbers must repeat twice and IDs cannot start with 0.
  */
-public class RepeatingNumbersProblem {
+public class RepeatingNumbersProblem extends AdventOfCode {
 
     private static List<Long> PRIME_NUMBER_CACHE = new ArrayList<>(List.of(2L, 3L, 5L, 7L, 11L));
 
+    public RepeatingNumbersProblem(String filename, boolean useExample) {
+        super(filename, useExample);
+    }
+
     private List<long[]> LoadTextFile() {
-        try (InputStream in = RotationLockProblem.class.getResourceAsStream("/data/repeatingnumbers.txt")) {
+        try (InputStream in = ReadFile()) {
             if (in == null) throw new FileNotFoundException("Resource not found");
 
             var content = new String(in.readAllBytes(), StandardCharsets.UTF_8);
@@ -27,22 +31,6 @@ public class RepeatingNumbersProblem {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public void findTotalOfRepeatingNumbersInFile() {
-        var minMaxPairs = LoadTextFile();
-        var result1 = minMaxPairs.stream()
-                .map(pair -> findTotalOfNumbersRepeatingTwiceSlow(pair[0], pair[1]))
-                .reduce(0L, Long::sum);
-        var result2 = minMaxPairs.stream()
-                .map(pair -> findTotalOfNumbersRepeatingTwiceFast(pair[0], pair[1]))
-                .reduce(0L, Long::sum);
-        var result3 = minMaxPairs.stream()
-                .map(pair -> findTotalOfAnyRepeatingDigit(pair[0], pair[1]))
-                .reduce(0L, Long::sum);
-        System.out.println("Slow result:\t" + result1);
-        System.out.println("Fast result:\t" + result2);
-        System.out.println("Any Repeating Pattern:\t" + result3);
     }
 
     public long findTotalOfNumbersRepeatingTwiceSlow(long min, long max) {
@@ -249,5 +237,21 @@ public class RepeatingNumbersProblem {
     public long calculateSumOfConsecutiveIntegers(long min, long max) {
         var average = (max + min) / 2.0;
         return (long)(average * (max - min + 1));
+    }
+
+    @Override
+    public Number solvePart1() {
+        var minMaxPairs = LoadTextFile();
+        return minMaxPairs.stream()
+                .map(pair -> findTotalOfNumbersRepeatingTwiceFast(pair[0], pair[1]))
+                .reduce(0L, Long::sum);
+    }
+
+    @Override
+    public Number solvePart2() {
+        var minMaxPairs = LoadTextFile();
+        return minMaxPairs.stream()
+                .map(pair -> findTotalOfAnyRepeatingDigit(pair[0], pair[1]))
+                .reduce(0L, Long::sum);
     }
 }

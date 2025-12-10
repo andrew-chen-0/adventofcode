@@ -1,15 +1,17 @@
-package main.java;
+package main.java.problems;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 
-public class BeamSplit {
+public class BeamSplit extends AdventOfCode {
+    public BeamSplit(String filename, boolean useExample) {
+        super(filename, useExample);
+    }
+
     class BeamTimelines {
         long count = 1L;
         int rayPosition;
@@ -25,7 +27,7 @@ public class BeamSplit {
     }
     boolean useExample = false;
     private ArrayList<ArrayList<Integer>> LoadTextFile() {
-        try (InputStream in = RotationLockProblem.class.getResourceAsStream("/data/beamsplit" + (useExample ? "example" : "") + ".txt")) {
+        try (InputStream in = ReadFile()) {
             if (in == null) throw new FileNotFoundException("Resource not found");
 
             var content = new String(in.readAllBytes(), StandardCharsets.UTF_8);
@@ -92,7 +94,7 @@ public class BeamSplit {
     }
 
     // Answer is 1658
-    public int solvePart1() {
+    public Integer solvePart1() {
         var map = LoadTextFile();
         var rayPositions = new ArrayList<Integer>();
 
@@ -104,7 +106,7 @@ public class BeamSplit {
     }
 
     // Answer is 53916299384254
-    public long solvePart2() {
+    public Long solvePart2() {
         var map = LoadTextFile();
         var rayPositions = new ArrayList<BeamTimelines>();
 

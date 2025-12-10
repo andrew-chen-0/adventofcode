@@ -1,24 +1,26 @@
-package main.java;
+package main.java.problems;
 
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 // We are given an input like ..@@.@@@@. if there are 4 or more rolls in the 8 squares adjacent
 // then we are unable to pick up the roll here ..xx.xx@x. we can see an example
-public class SlidingWindow {
-
+public class SurroundingPositionCheck extends AdventOfCode {
     private static int EMPTY = 0;
     private static int ROLL = 1;
     private static int ROLL_TO_REMOVE = 2;
 
+    public SurroundingPositionCheck(String filename, boolean useExample) {
+        super(filename, useExample);
+    }
+
     private List<int[]> LoadTextFile() {
-        try (InputStream in = RotationLockProblem.class.getResourceAsStream("/data/slidingrolls.txt")) {
+        try (InputStream in = ReadFile()) {
             if (in == null) throw new FileNotFoundException("Resource not found");
 
             var content = new String(in.readAllBytes(), StandardCharsets.UTF_8);
@@ -32,13 +34,13 @@ public class SlidingWindow {
 
 
     // Answer is 1486
-    public int solvePart1() {
+    public Integer solvePart1() {
         var input = LoadTextFile();
         return findNumberOfRolls(input, 1, 4);
     }
 
     // Answer is 9024
-    public int solvePart2() {
+    public Integer solvePart2() {
         var input = LoadTextFile();
         var result = 0;
         var itr = 0;

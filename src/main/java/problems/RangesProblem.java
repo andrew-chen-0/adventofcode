@@ -1,16 +1,18 @@
-package main.java;
+package main.java.problems;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 // We have input like 11-24, 2-4, 5-6 and we get given numbers that we want to check fit into some range
 // If the ranges are overlapping like 11-24, 15-30 we want to extend the range to become a single one 11-30
-public class RangesProblem {
+public class RangesProblem extends AdventOfCode {
+
+    public RangesProblem(String filename, boolean useExample) {
+        super(filename, useExample);
+    }
 
     // Ranges are inclusive
     class Range {
@@ -63,7 +65,7 @@ public class RangesProblem {
 
     boolean useExample = false;
     private LoadedFileData LoadTextFile() {
-        try (InputStream in = RotationLockProblem.class.getResourceAsStream("/data/ranges" + (useExample ? "example" : "") + ".txt")) {
+        try (InputStream in = ReadFile()) {
             if (in == null) throw new FileNotFoundException("Resource not found");
 
             var content = new String(in.readAllBytes(), StandardCharsets.UTF_8);
@@ -115,7 +117,7 @@ public class RangesProblem {
 
     // Answer is 770
     // Here we load all the ranges and check to see how many IDs fall in those ranges
-    public int solvePart1() {
+    public Integer solvePart1() {
         var data = LoadTextFile();
 
         var validCount = 0;
@@ -133,7 +135,7 @@ public class RangesProblem {
 
     // They want to know all numbers within the ranges
     // Ex. 11 - 15 would be 11, 12, 13, 14, 15 which means there are 5 numbers
-    public long solvePart2() {
+    public Long solvePart2() {
         var data = LoadTextFile();
         long result = 0;
         for(var range : data.Ranges) {

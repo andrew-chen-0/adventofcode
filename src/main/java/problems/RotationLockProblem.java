@@ -1,10 +1,9 @@
-package main.java;
+package main.java.problems;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 /**
  * We have a rotating lock with numbers from 0-99
@@ -16,12 +15,16 @@ import java.util.Arrays;
  * For the second part we want to count the number of times the position crosses 0
  * Note that given it is a rotation lock if it passes 99 it wraps back to 0
  */
-public class RotationLockProblem {
+public class RotationLockProblem extends AdventOfCode {
 
     private static int POSITION = 50;
 
+    public RotationLockProblem(String filename, boolean useExample) {
+        super(filename, useExample);
+    }
+
     private int[] LoadTextFile() {
-        try (InputStream in = RotationLockProblem.class.getResourceAsStream("/data/rotationlock.txt")) {
+        try (InputStream in = ReadFile()) {
             if (in == null) throw new FileNotFoundException("Resource not found");
 
             var content = new String(in.readAllBytes(), StandardCharsets.UTF_8);
@@ -75,5 +78,15 @@ public class RotationLockProblem {
             }
         }
         return count;
+    }
+
+    @Override
+    public Number solvePart1() {
+        return GetNumberOfTimesLockStopsAt0();
+    }
+
+    @Override
+    public Number solvePart2() {
+        return GetTotalNumberOfTimes0isPassed();
     }
 }

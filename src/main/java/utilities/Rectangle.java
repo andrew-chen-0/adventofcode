@@ -1,7 +1,5 @@
 package main.java.utilities;
 
-import main.java.LargestRectangle;
-
 import java.util.ArrayList;
 import java.util.List;
 

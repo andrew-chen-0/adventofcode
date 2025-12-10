@@ -1,4 +1,4 @@
-package main.java;
+package main.java.problems;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -7,7 +7,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
-public class SlidingTwoMaximumNumbers {
+public class SlidingTwoMaximumNumbers extends AdventOfCode {
+
+    public SlidingTwoMaximumNumbers(String filename, boolean useExample) {
+        super(filename, useExample);
+    }
 
     class FixedSizeQueue {
         long[] array;
@@ -42,7 +46,7 @@ public class SlidingTwoMaximumNumbers {
     }
 
     private List<int[]> LoadTextFile() {
-        try (InputStream in = RotationLockProblem.class.getResourceAsStream("/data/slidingtoptwonumbers.txt")) {
+        try (InputStream in = ReadFile()) {
             if (in == null) throw new FileNotFoundException("Resource not found");
 
             var content = new String(in.readAllBytes(), StandardCharsets.UTF_8);
@@ -54,11 +58,11 @@ public class SlidingTwoMaximumNumbers {
         }
     }
 
-    public long solvePart1() {
+    public Long solvePart1() {
         return findTwoDigitsToMakeLargestNumber(2);
     }
 
-    public long solvePart2() {
+    public Long solvePart2() {
         return findTwoDigitsToMakeLargestNumber(12);
     }
 

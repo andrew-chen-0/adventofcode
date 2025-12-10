@@ -1,4 +1,4 @@
-package main.java;
+package main.java.utilities;
 
 public class CoordinatesHashing {
     // Strong 64-bit mixing function (MurmurHash3 finalizer)

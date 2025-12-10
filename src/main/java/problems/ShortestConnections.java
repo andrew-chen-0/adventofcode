@@ -1,4 +1,4 @@
-package main.java;
+package main.java.problems;
 
 import main.java.utilities.Edge;
 import main.java.utilities.Node;
@@ -9,11 +9,16 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public class ShortestConnections {
+public class ShortestConnections extends AdventOfCode {
 
     boolean useExample = false;
+
+    public ShortestConnections(String filename, boolean useExample) {
+        super(filename, useExample);
+    }
+
     private ArrayList<List<Long>> LoadTextFile() {
-        try (InputStream in = RotationLockProblem.class.getResourceAsStream("/data/shortestconnection" + (useExample ? "example" : "") + ".txt")) {
+        try (InputStream in = ReadFile()) {
             if (in == null) throw new FileNotFoundException("Resource not found");
 
             var content = new String(in.readAllBytes(), StandardCharsets.UTF_8);
