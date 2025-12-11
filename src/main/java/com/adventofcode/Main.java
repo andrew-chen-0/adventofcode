@@ -2,6 +2,7 @@ package com.adventofcode;
 
 import com.adventofcode.problems.*;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -12,19 +13,19 @@ public class Main {
     }
 
     static Map<Integer, AdventOfCode> AOC_DAY_TO_PROBLEM(String filename, boolean useExample) {
-        return Map.of(
-                1, new RotationLockProblem(useDefaultIfNull(filename, "rotationlock.txt"), useExample),
-                2, new RepeatingNumbersProblem(useDefaultIfNull(filename,"repeatingnumbers.txt"), useExample),
-                3, new SlidingTwoMaximumNumbers(useDefaultIfNull(filename, "slidingtoptwonumbers.txt"), useExample),
-                4, new SurroundingPositionCheck(useDefaultIfNull(filename, "slidingrolls.txt"), useExample),
-                5, new RangesProblem(useDefaultIfNull(filename, "ranges.txt"), useExample),
-                6, new MathOperationsProblem(useDefaultIfNull(filename, "mathproblem.txt"), useExample),
-                7, new BeamSplit(useDefaultIfNull(filename, "beamsplit.txt"), useExample),
-                8, new ShortestConnections(useDefaultIfNull(filename, "shortestconnection.txt"), useExample),
-                9, new LargestRectangle(useDefaultIfNull(filename, "largestrectangle.txt"), useExample),
-                10, new JoltageConfigurationProblem(useDefaultIfNull(filename, "dfs.txt"), useExample)
-
-        );
+        var AdventOfCodeMap = new HashMap<Integer, AdventOfCode>();
+        AdventOfCodeMap.put(1, new RotationLockProblem(useDefaultIfNull(filename, "rotationlock.txt"), useExample));
+        AdventOfCodeMap.put(2, new RepeatingNumbersProblem(useDefaultIfNull(filename,"repeatingnumbers.txt"), useExample));
+        AdventOfCodeMap.put(3, new SlidingTwoMaximumNumbers(useDefaultIfNull(filename, "slidingtoptwonumbers.txt"), useExample));
+        AdventOfCodeMap.put(4, new SurroundingPositionCheck(useDefaultIfNull(filename, "slidingrolls.txt"), useExample));
+        AdventOfCodeMap.put(5, new RangesProblem(useDefaultIfNull(filename, "ranges.txt"), useExample));
+        AdventOfCodeMap.put(6, new MathOperationsProblem(useDefaultIfNull(filename, "mathproblem.txt"), useExample));
+        AdventOfCodeMap.put(7, new BeamSplit(useDefaultIfNull(filename, "beamsplit.txt"), useExample));
+        AdventOfCodeMap.put(8, new ShortestConnections(useDefaultIfNull(filename, "shortestconnection.txt"), useExample));
+        AdventOfCodeMap.put(9, new LargestRectangle(useDefaultIfNull(filename, "largestrectangle.txt"), useExample));
+        AdventOfCodeMap.put(10, new JoltageConfigurationProblem(useDefaultIfNull(filename, "dfs.txt"), useExample));
+        AdventOfCodeMap.put(11, new DirectedGraph(useDefaultIfNull(filename, "directedgraph.txt"), useExample));
+        return AdventOfCodeMap;
     }
 
     static Number timeFunction(Function<Void, Number> function) {
@@ -42,7 +43,7 @@ public class Main {
         var filename = args.length > 1 ? args[1] : null;
         var useExample = args.length > 2 && Boolean.parseBoolean(args[2]);
 
-        day = 10;
+        day = 11;
         useExample = false;
         var problem = AOC_DAY_TO_PROBLEM(filename, useExample).get(day);
 
