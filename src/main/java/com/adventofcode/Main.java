@@ -25,6 +25,7 @@ public class Main {
         AdventOfCodeMap.put(9, new LargestRectangle(useDefaultIfNull(filename, "largestrectangle.txt"), useExample));
         AdventOfCodeMap.put(10, new JoltageConfigurationProblem(useDefaultIfNull(filename, "dfs.txt"), useExample));
         AdventOfCodeMap.put(11, new DirectedGraph(useDefaultIfNull(filename, "directedgraph.txt"), useExample));
+        AdventOfCodeMap.put(12, new FittingShapesInRectangle(useDefaultIfNull(filename, "fitshapes.txt"), useExample));
         return AdventOfCodeMap;
     }
 
@@ -43,8 +44,8 @@ public class Main {
         var filename = args.length > 1 ? args[1] : null;
         var useExample = args.length > 2 && Boolean.parseBoolean(args[2]);
 
-        day = 11;
-        useExample = false;
+        day = 12;
+        useExample = true;
         var problem = AOC_DAY_TO_PROBLEM(filename, useExample).get(day);
 
         System.out.println("Part1:\t" + timeFunction((t) -> problem.solvePart1()));
