@@ -22,6 +22,16 @@ application {
     mainClass = 'com.adventofcode.Main'
 }
 
+tasks.register('runLeetCode', JavaExec) {
+    group = 'application'
+    description = 'Runs the LeetCode problem runner.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.leetcode.Main'
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
