@@ -1,0 +1,129 @@
+package com.leetcode;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class MedianTwoSortedArraysBinarySearchTest {
+
+    private final MedianTwoSortedArraysBinarySearch medianFinder = new MedianTwoSortedArraysBinarySearch();
+
+    @Test
+    void findsMedianWhenCombinedLengthIsOdd() {
+        var nums1 = new int[]{1, 3};
+        var nums2 = new int[]{2};
+        var actual = medianFinder.findMedianSortedArrays(nums1, nums2);
+
+        assertEquals(2.0, actual);
+    }
+
+    @Test
+    void findsMedianWhenCombinedLengthIsEven() {
+        var nums1 = new int[]{1, 2};
+        var nums2 = new int[]{3, 4};
+        var actual = medianFinder.findMedianSortedArrays(nums1, nums2);
+
+        assertEquals(2.5, actual);
+    }
+
+    @Test
+    void findsMedianWhenOneArrayIsEmpty() {
+        var nums1 = new int[]{};
+        var nums2 = new int[]{2, 3};
+        var actual = medianFinder.findMedianSortedArrays(nums1, nums2);
+
+        assertEquals(2.5, actual);
+    }
+
+    @Test
+    void returnsZeroWhenBothArraysAreEmpty() {
+        var nums1 = new int[]{};
+        var nums2 = new int[]{};
+        var actual = medianFinder.findMedianSortedArrays(nums1, nums2);
+
+        assertEquals(0.0, actual);
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("complexMedianCases")
+        void findsMedianForComplexInputs(String description, int[] nums1, int[] nums2, double expected) {
+        var actual = medianFinder.findMedianSortedArrays(nums1, nums2);
+
+        assertEquals(expected, actual);
+    }
+
+    private static Stream<Arguments> complexMedianCases() {
+        return Stream.of(
+                Arguments.of(
+                        "highly uneven array lengths",
+                        new int[]{1},
+                        new int[]{2, 3, 4, 5, 6, 7, 8, 9, 10},
+                        5.5),
+                Arguments.of(
+                        "duplicates span both middle positions",
+                        new int[]{1, 2, 2, 2, 9},
+                        new int[]{2, 2, 3, 4, 5},
+                        2.0),
+                Arguments.of(
+                        "negative values and duplicates",
+                        new int[]{-10, -5, -5, -1},
+                        new int[]{-6, -5, 0, 8, 20},
+                        -5.0),
+                Arguments.of(
+                        "non-overlapping value ranges",
+                        new int[]{-100, -90, -80, -70},
+                        new int[]{10, 20, 30, 40},
+                        -30.0),
+                Arguments.of(
+                        "additional test case",
+                        new int[]{1, 2},
+                        new int[]{-1, 3},
+                        1.5),
+                Arguments.of(
+                        "additional test case edge case with single number",
+                        new int[]{2},
+                        new int[]{1, 3, 4},
+                        2.5),
+                Arguments.of(
+                        "additional test case edge case with single number",
+                        new int[]{3},
+                        new int[]{1, 2, 4},
+                        2.5),
+                Arguments.of(
+                        "additional test case edge case with single number",
+                        new int[]{5},
+                        new int[]{1, 2, 3, 4, 6},
+                        3.5),
+                Arguments.of(
+                        "additional test case edge case with single number",
+                        new int[]{1, 3},
+                        new int[]{2, 4, 5, 6},
+                        3.5),
+                Arguments.of(
+                        "additional test case edge case with single number",
+                        new int[]{3, 5},
+                        new int[]{1, 2, 4, 6},
+                        3.5),
+                Arguments.of(
+                        "additional test case edge case with single number",
+                        new int[]{1, 2, 4},
+                        new int[]{3, 5, 6},
+                        3.5),
+                Arguments.of(
+                        "additional test case edge case with single number",
+                        new int[]{1, 2, 4},
+                        new int[]{3, 5, 6, 7},
+                        4.0),
+                Arguments.of(
+                        "additional test case edge case with single number",
+                        new int[]{1, 2, 5},
+                        new int[]{3, 4, 6, 7},
+                        4.0)
+        );
+    }
+}
