@@ -1,13 +1,11 @@
 package com.leetcode;
 
-import org.apache.commons.math3.util.Pair;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-public class ThreeSum implements ILeetCodeProblem {
+public class ThreeSum {
 
     // Given a list of numbers return all pairs that add up to the target
     public static List<List<Integer>> twoSumExtended(int[] nums, int target) {
@@ -42,7 +40,7 @@ public class ThreeSum implements ILeetCodeProblem {
 
     public static List<List<Integer>> threeSum(int[] nums) {
         Arrays.sort(nums);
-        var results = new ArrayList<List<Integer>>();
+        var results = new HashSet<List<Integer>>();
 
         // Both are inclusive
         int negativeNumberEndIdx = -1;
@@ -66,7 +64,7 @@ public class ThreeSum implements ILeetCodeProblem {
 
         // Either missing positive numbers or negative numbers so cannot be used to cancel out each other when summing
         if (positiveNumberStartIdx == -1 || negativeNumberEndIdx == -1) {
-            return results;
+            return results.stream().toList();
         }
 
         // Need at least 2 numbers to do twoSum
@@ -88,12 +86,10 @@ public class ThreeSum implements ILeetCodeProblem {
         if (positiveNumbers.length > 1) {
             Arrays.stream(negativeNumbers).forEach(i -> {
                 var values = twoSumExtended(positiveNumbers, i);
-                values.forEach(pair -> {
-                    results.add(List.of(-i, pair.get(0), pair.get(1)));
-                });
+                values.forEach(pair -> results.add(List.of(-i, pair.get(0), pair.get(1))));
             });
         }
-        return results.stream().distinct().toList();
+        return results.stream().toList();
     }
 
     private static void reverseArray(int [] arr) {
@@ -102,11 +98,5 @@ public class ThreeSum implements ILeetCodeProblem {
             arr[i] = arr[arr.length - 1 - i];
             arr[arr.length - 1 - i] = temp;
         }
-    }
-
-    @Override
-    public void RunTestCases() {
-        System.out.println(threeSum(new int[]{-1, 0, 1, 2, -1, -4 }));
-        System.out.println(threeSum(new int[]{0, 1, 1 }));
     }
 }
